@@ -17,11 +17,14 @@ func main() {
 		cmd = strings.TrimSpace(cmd)
 		// store the string as a slice, using a delimiter " "
 		args := strings.Split(cmd, " ")
+		if args[0] == "exit" {
+			return
+		}
 		// validating the command
 		err := validateCommand(args)
 		if err != nil {
 			fmt.Println(err)
-			return
+			continue
 		}
 		// figuring out the command type
 		cmdType := commandType(args)
