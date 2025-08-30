@@ -14,7 +14,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	GetRequest(w, r)
 }
 
-func GetRequest(w http.ResponseWriter, r *http.Request) {
+func GetRequest(w http.ResponseWriter, r *http.Request) (int, string) {
 	url := originServer + r.URL.Path
 	if r.URL.RawQuery != "" {
 		url += "?" + r.URL.RawQuery
@@ -23,12 +23,12 @@ func GetRequest(w http.ResponseWriter, r *http.Request) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "failed to read request body", http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, "failed to read request body"
 	}
 	r.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
 	hash := sha256.Sum256(bodyBytes)
-	key := r.Method + "#" + r.URL.Path + "#" + r.URL.RawQuery + "#" + hex.EncodeToString(hash[:])
+	key := r.Method + "#" + url + "#" + hex.EncodeToString(hash[:])
 
 	// if the entry is present in the cache
 	if entry, ok := cache[key]; ok {
@@ -44,7 +44,7 @@ func GetRequest(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("X-Cache", "HIT")
 			w.WriteHeader(entry.StatusCode)
 			w.Write(entry.Body)
-			return
+			return entry.StatusCode, "Data returned from cache"
 		} else {
 			fmt.Println("Cache expired:", key)
 			delete(cache, key) // remove expired entry
@@ -57,7 +57,7 @@ func GetRequest(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		http.Error(w, "error contacting origin", http.StatusBadGateway)
-		return
+		return http.StatusBadGateway, "error contacting origin"
 	}
 	defer resp.Body.Close()
 
@@ -81,5 +81,5 @@ func GetRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-Cache", "MISS")
 	w.WriteHeader(resp.StatusCode)
 	w.Write(respBytes)
-	return
+	return resp.StatusCode, "Data returned from origin server"
 }

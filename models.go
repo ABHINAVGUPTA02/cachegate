@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type CacheEntry struct {
 	StatusCode int
@@ -15,5 +18,6 @@ var cache = make(map[string]CacheEntry)
 
 // Clear the whole cache
 func clearCache() {
-	cache = make(map[string]CacheEntry) // reset
+	cache = make(map[string]CacheEntry)
+	fmt.Println("cleared....")
 }

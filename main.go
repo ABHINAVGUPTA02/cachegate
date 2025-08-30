@@ -32,23 +32,22 @@ func main() {
 		// figuring out the command type
 		cmdType := commandType(args)
 		// based on the type of command we will perform the necessary actions
+		fmt.Printf("Command Type: %d\n", cmdType)
 		if cmdType == 0 {
 			clearCache()
 			fmt.Println("clear cache command")
+			continue
 		} else {
 			portNum = args[2]
 			originServer = args[4]
 			r := SetupRouter()
 			fmt.Printf("server running on port: %s for origin server: %s\n", portNum, originServer)
-			err = http.ListenAndServe(
-				":"+portNum,
-				r,
-			)
-
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
+			go func() {
+				http.ListenAndServe(
+					":"+portNum,
+					r,
+				)
+			}()
 
 			fmt.Println("starting the proxy command")
 		}
