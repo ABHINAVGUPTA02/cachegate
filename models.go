@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -13,11 +12,8 @@ type CacheEntry struct {
 	TTL        time.Duration
 }
 
-// The global cache (map of key → cached response)
 var cache = make(map[string]CacheEntry)
 
-// Clear the whole cache
 func clearCache() {
 	cache = make(map[string]CacheEntry)
-	fmt.Println("cleared....")
 }

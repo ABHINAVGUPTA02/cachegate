@@ -9,7 +9,6 @@ func commandType(args []string) int {
 	if len(args) == 2 {
 		return 0
 	}
-
 	return 1
 }
 

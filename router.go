@@ -9,7 +9,6 @@ import (
 func SetupRouter() http.Handler {
 	r := chi.NewRouter()
 
-	// Routes
 	r.Get("/*", GetHandler)
 
 	return r
